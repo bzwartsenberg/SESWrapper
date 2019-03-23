@@ -186,7 +186,7 @@ class SESWrapper:
                                          ctypes.c_char_p, #param name
                                          ctypes.c_int, #index
                                          ctypes.POINTER(ctypes.c_double), #data pointer
-                                         ctypes.POINTER(ctypes.c_int), #size
+                                         ctypes.c_int, #size
                                          )        
         
         funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))
@@ -199,7 +199,7 @@ class SESWrapper:
                                          ctypes.c_char_p, #param name
                                          ctypes.c_int, #index
                                          ctypes.POINTER(ctypes.c_int), #data pointer
-                                         ctypes.POINTER(ctypes.c_int), #size
+                                         ctypes.c_int, #size
                                          )        
         
         funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))
@@ -212,7 +212,7 @@ class SESWrapper:
                                          ctypes.c_char_p, #param name
                                          ctypes.c_int, #index
                                          ctypes.c_char_p, #data pointer
-                                         ctypes.POINTER(ctypes.c_int), #size
+                                         ctypes.c_int, #size
                                          )        
         
         funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))

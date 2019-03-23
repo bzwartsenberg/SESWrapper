@@ -93,11 +93,11 @@ if __name__ == '__main__':
     print('Generated spectrum has size:', ctypes.sizeof(spectrum))
     
     for i in range(10):
-        print(ses.startAcquisition())
+        print(ses.StartAcquisition())
         print(ses.WaitForRegionReady(-1))
         print(ses.ContinueAcquisition())
     
-    print(ses.getAcquiredDataDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
+    print(ses.GetAcquiredDataDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
           
     
     
