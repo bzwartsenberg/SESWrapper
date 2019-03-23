@@ -27,6 +27,17 @@ class DetectorRegion(ctypes.Structure):
                 ('adcMode_', ctypes.c_char)]    ###this may actually be a bool? It's true or false
     
     
+class DetectorInfo(ctypes.Structure):
+    _fields_ = [('timerControlled_', ctypes.c_bool),
+                ('xChannels_', ctypes.c_int),
+                ('yChannels_', ctypes.c_int),
+                ('maxSlices_', ctypes.c_int),
+                ('maxChannels_', ctypes.c_int),
+                ('frameRate_', ctypes.c_int),
+                ('adcPresent_', ctypes.c_bool),
+                ('discPresent_', ctypes.c_bool)]    ###this may actually be a bool? It's true or false
+    
+        
     
     
     
