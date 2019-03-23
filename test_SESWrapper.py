@@ -42,11 +42,11 @@ if __name__ == '__main__':
     print(ses.LoadInstrument(inst_path.encode('ASCII')))
     
     
-    print(ses.setPropertyString('element_set'.encode('ASCII'), -1, 'Low Pass (Laser)'.encode('ASCII')))
-    print(ses.setPropertyString('lens_mode'.encode('ASCII'), -1, 'Transmission'.encode('ASCII')))
+    print(ses.SetPropertyString('element_set'.encode('ASCII'), -1, 'Low Pass (Laser)'.encode('ASCII')))
+    print(ses.SetPropertyString('lens_mode'.encode('ASCII'), -1, 'Transmission'.encode('ASCII')))
     
-    Epass = 10.
-    print(ses.setPropertyDouble('pass_energy'.encode('ASCII'), -1, Epass))
+    Epass = ctypes.c_double(10)
+    print(ses.SetPropertyDouble('pass_energy'.encode('ASCII'), -1, ctypes.byref(Epass)))
     
     
     ##set detector and analyzer
@@ -80,13 +80,13 @@ if __name__ == '__main__':
     analyzer2 = AnalyzerRegion()
     print(ses.GetAnalyzerRegion(analyzer2))
     
-    print('Returned analyzer has lowenergy', analyzer2.lowenergy_)
+    print('Returned analyzer has lowenergy', analyzer2.lowEnergy_)
     
     
     
     ses.InitAcquisition(False, True)
     channels = ctypes.c_int(0)
-    print(ses.GetAcquiredData('acq_channels'.encode('ASCII'), 0, channels, ctypes.sizeof(channels)))
+    print(ses.GetAcquiredDataInteger('acq_channels'.encode('ASCII'), 0, ctypes.byref(channels), ctypes.sizeof(channels)))
 
     spectrum = (ctypes.c_double * channels.value)()
     
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         print(ses.WaitForRegionReady(-1))
         print(ses.ContinueAcquisition())
     
-    print(ses.getAcquiredData('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
+    print(ses.getAcquiredDataDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
           
     
     
