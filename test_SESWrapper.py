@@ -10,8 +10,8 @@ Created on Sat Mar 23 14:00:29 2019
 
 from structs import AnalyzerRegion, DetectorRegion, DetectorInfo
 from sesFunctions import SESWrapper
-
-
+import ctypes
+import numpy as np
 
 
 if __name__ == '__main__':
@@ -41,11 +41,19 @@ if __name__ == '__main__':
     
     print(ses.LoadInstrument(inst_path.encode('ASCII')))
     
+    
+    print(ses.setPropertyString('element_set'.encode('ASCII'), -1, 'Low Pass (Laser)'.encode('ASCII')))
+    print(ses.setPropertyString('lens_mode'.encode('ASCII'), -1, 'Transmission'.encode('ASCII')))
+    
+    Epass = 10.
+    print(ses.setPropertyDouble('pass_energy'.encode('ASCII'), -1, Epass))
+    
+    
     ##set detector and analyzer
     
     info = DetectorInfo()
     print(ses.GetDetectorInfo(info))
-    print('Number of x channels: ',info.xChannels)
+    print('Number of x channels: ',info.xChannels_)
 
     detector = DetectorRegion()
     detector.firstXChannel_ = 0
@@ -68,8 +76,34 @@ if __name__ == '__main__':
 
     print(ses.SetAnalyzerRegion(analyzer))
     
+    #test:
+    analyzer2 = AnalyzerRegion()
+    print(ses.GetAnalyzerRegion(analyzer2))
+    
+    print('Returned analyzer has lowenergy', analyzer2.lowenergy_)
     
     
+    
+    ses.InitAcquisition(False, True)
+    channels = ctypes.c_int(0)
+    print(ses.GetAcquiredData('acq_channels'.encode('ASCII'), 0, channels, ctypes.sizeof(channels)))
+
+    spectrum = (ctypes.c_double * channels.value)()
+    
+    print('Generated spectrum has size:', ctypes.sizeof(spectrum))
+    
+    for i in range(10):
+        print(ses.startAcquisition())
+        print(ses.WaitForRegionReady(-1))
+        print(ses.ContinueAcquisition())
+    
+    print(ses.getAcquiredData('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
+          
+    
+    
+    spectrum_np = np.array(spectrum)
+    
+    np.savetxt('test.txt',spectrum_np)
     
     print(ses.Finalize())
     

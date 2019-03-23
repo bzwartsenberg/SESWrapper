@@ -84,7 +84,7 @@ class SESWrapper:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         AnalyzerRegion, #file name
+                                         AnalyzerRegion,
                                          )        
         
         funcparams = ((1,'analyzer_region'),)
@@ -95,7 +95,7 @@ class SESWrapper:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         AnalyzerRegion, #file name
+                                         AnalyzerRegion,
                                          )        
         
         funcparams = ((1,'analyzer_region'),)
@@ -105,7 +105,7 @@ class SESWrapper:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         DetectorRegion, #file name
+                                         DetectorRegion,
                                          )        
         
         funcparams = ((1,'detector_region'),)
@@ -115,7 +115,7 @@ class SESWrapper:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         DetectorRegion, #file name
+                                         DetectorRegion,
                                          )        
         
         funcparams = ((1,'detector_region'),)
@@ -125,13 +125,101 @@ class SESWrapper:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         DetectorInfo, #file name
+                                         DetectorInfo,
                                          )        
         
         funcparams = ((1,'detector_info'),)
         self.GetDetectorInfo = funcproto(('WRP_GetDetectorInfo',self.sesdll),funcparams)
                 
                                 
+        ####### initAcquisition:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         ctypes.c_bool, 
+                                         ctypes.c_bool,
+                                         )        
+        
+        funcparams = ((1,'blockPointReady'),(1,'blockRegionReady'))
+        self.InitAcquisition = funcproto(('WRP_InitAcquisition',self.sesdll),funcparams)
+                
+                                
+        ####### startAcquisition:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         )        
+        
+        funcparams = ()
+        self.StartAcquisition = funcproto(('WRP_StartAcquisition',self.sesdll),funcparams)
+                
+
+                                
+        ####### waitForRegionReady:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         ctypes.c_int, 
+                                         )        
+        
+        funcparams = ((1,'timeout_ms'),)
+        self.WaitForRegionReady = funcproto(('WRP_WaitForRegionReady',self.sesdll),funcparams)
+                
+
+
+                                
+        ####### continueAcquisition:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         )        
+        
+        funcparams = ()
+        self.ContinueAcquisition = funcproto(('WRP_ContinueAcquisition',self.sesdll),funcparams)
+                
+
+
+        ####### GetAcquiredDataDouble:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         ctypes.c_char_p, #param name
+                                         ctypes.c_int, #index
+                                         ctypes.c_double, #data pointer
+                                         ctypes.c_int, #size
+                                         )        
+        
+        funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))
+        self.GetAcquiredDataDouble = funcproto(('WRP_GetAcquiredDataDouble',self.sesdll),funcparams)
+                
+        ####### GetAcquiredDataInteger:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         ctypes.c_char_p, #param name
+                                         ctypes.c_int, #index
+                                         ctypes.c_int, #data pointer
+                                         ctypes.c_int, #size
+                                         )        
+        
+        funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))
+        self.GetAcquiredDataInteger = funcproto(('WRP_GetAcquiredDataInteger',self.sesdll),funcparams)
+                
+        ####### GetAcquiredDataString:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         ctypes.c_char_p, #param name
+                                         ctypes.c_int, #index
+                                         ctypes.c_char_p, #data pointer
+                                         ctypes.c_int, #size
+                                         )        
+        
+        funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))
+        self.GetAcquiredDataString = funcproto(('WRP_GetAcquiredDataString',self.sesdll),funcparams)
+                
+                                                                                      
+                
         
         ######Finalize:
         
