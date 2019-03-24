@@ -97,7 +97,7 @@ if __name__ == '__main__':
         print(ses.WaitForRegionReady(-1))
         print(ses.ContinueAcquisition())
     
-    print(ses.GetAcquiredDataDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
+    print(ses.GetAcquiredDataVectorDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
           
     
     
@@ -106,6 +106,21 @@ if __name__ == '__main__':
     np.savetxt('test.txt',spectrum_np)
     
     print(ses.Finalize())
+    
+    
+    
+### note: here they do a similar thingk, passing an array by reference, seems like 
+### the way I do it should work:
+#https://stackoverflow.com/questions/51867653/passing-stdvector-from-c-to-python-via-ctypes-getting-nonsensical-values
+# actually: they "cheat" by copying the vector to an array. So I see two ways out:
+
+# one: make another shared library, that does the data conversion through some function
+    
+    
+# two: make a class in another shared library, that has a vector at its core and 
+# does read/write operations so you can access the data. A pointer can be shared
+# for accessing the vector
+# Here: https://stackoverflow.com/questions/16885344/how-to-handle-c-return-type-stdvectorint-in-python-ctypes (second answer)
     
 
 
