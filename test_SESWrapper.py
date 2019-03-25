@@ -86,9 +86,10 @@ if __name__ == '__main__':
     
     ses.InitAcquisition(False, True)
     channels = ctypes.c_int(0)
-    print(ses.GetAcquiredDataInteger('acq_channels'.encode('ASCII'), 0, ctypes.byref(channels), ctypes.sizeof(channels)))
+    channels_size = ctypes.c_int(0)
+    print(ses.GetAcquiredDataInteger('acq_channels'.encode('ASCII'), 0, ctypes.byref(channels), ctypes.byref(channels_size)))
 
-    spectrum = (ctypes.c_double * channels.value)()
+    spectrum = (ctypes.c_double * 200)() ## can be oversized
     
     print('Generated spectrum has size:', ctypes.sizeof(spectrum))
     
@@ -97,7 +98,8 @@ if __name__ == '__main__':
         print(ses.WaitForRegionReady(-1))
         print(ses.ContinueAcquisition())
     
-    print(ses.GetAcquiredDataVectorDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.sizeof(spectrum)))
+    ## acq_spectrum will write the size back to &channels
+    print(ses.GetAcquiredDataVectorDouble('acq_spectrum'.encode('ASCII'), 0, spectrum, ctypes.byref(channels)))
           
     
     
