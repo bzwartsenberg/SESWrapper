@@ -242,7 +242,7 @@ class SESWrapper:
                                          )        
         
         funcparams = ((1,'param_name'),(1,'index'),(1,'data_pointer'),(1,'data_size'))
-        self.GetAcquiredDataVectorInteger = funcproto(('WRP_GetAcquiredDataVectorInteger',self.sesdll),funcparams)
+        self.GetAcquiredDataVectorInt32 = funcproto(('WRP_GetAcquiredDataVectorInt32',self.sesdll),funcparams)
                                                                                       
                 
         
