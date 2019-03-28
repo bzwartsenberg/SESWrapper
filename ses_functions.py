@@ -207,6 +207,9 @@ class SESFunctions:
         Returns:
             value of paramter
             """
+        if self.verbose:
+            print('Getting datapoint')
+            
         returnvar = self.acq_returntype[name](0)
         returnsize = ctypes.c_int(0)
         name = name.encode('ASCII')
@@ -223,6 +226,9 @@ class SESFunctions:
             data: optional pointer to data holding object (numpy array)
             index: for parameters that require an index
             """            
+        if self.verbose:
+            print('Getting data array')
+            
         returnarray = (ctypes.c_double * size)()
         returnsize = ctypes.c_int(size)
         name = name.encode('ASCII')
@@ -239,6 +245,10 @@ class SESFunctions:
         """Finalize the instrument
         Args: None
         Returns: None"""
+        
+        if self.verbose:
+            print('Finalizing')
+        
         
         self.e.error(self.sesdll.Finalize())
         
