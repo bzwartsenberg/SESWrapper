@@ -37,7 +37,7 @@ if __name__ == '__main__':
               'pass_energy' : 10.,
               'sweeps' : 2}
     
-    sm.MeasureAnalyzerRegion(region, data = None, updatefreq = 'slice', 
+    data = sm.MeasureAnalyzerRegion(region, data = None, updatefreq = 'slice', 
                               path = None)
     
     

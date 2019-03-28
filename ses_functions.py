@@ -86,7 +86,7 @@ class SESFunctions:
                 print('Setting string property')    
             value = value.encode('ASCII')
             pname = pname.encode('ASCII')            
-            self.e.error(self.sesdll.SetPropertyDouble(pname, 0, ctypes.byref(value))) ##middle argument is size
+            self.e.error(self.sesdll.SetPropertyString(pname, 0, value)) ##middle argument is size
             
                     
         
@@ -212,8 +212,8 @@ class SESFunctions:
             
         returnvar = self.acq_returntype[name](0)
         returnsize = ctypes.c_int(0)
-        name = name.encode('ASCII')
-        self.e.error(self.sesdll.acq_funcs[name](name, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
+        nameb = name.encode('ASCII')
+        self.e.error(self.acq_funcs[name](nameb, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
         
         return returnvar.value
             
@@ -231,8 +231,8 @@ class SESFunctions:
             
         returnarray = (ctypes.c_double * size)()
         returnsize = ctypes.c_int(size)
-        name = name.encode('ASCII')
-        self.e.error(self.sesdll.acq_funcs[name](name, index, returnarray, ctypes.byref(returnsize)))
+        nameb = name.encode('ASCII')
+        self.e.error(self.acq_funcs[name](nameb, index, returnarray, ctypes.byref(returnsize)))
         
         if data is None:
             data = np.array(returnarray)

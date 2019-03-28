@@ -75,7 +75,7 @@ class SESMeasure:
             self.ses.WaitForRegionReady(-1)
             self.ContinueAcquisition()
 
-        data = self.GetAcquiredDataArray('acq_image', data_size, data = data)
+        data = self.ses.GetAcquiredDataArray('acq_image', data_size, data = data)
         
         if path is not None:
             np.savetxt(path, data)
