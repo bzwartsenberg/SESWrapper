@@ -9,7 +9,7 @@ Created on Sat Mar 23 13:37:38 2019
 import ctypes
 from structs import AnalyzerRegion, DetectorRegion, DetectorInfo
 
-class SESWrapper:
+class SESdll:
     
     def __init__(self, sesdllpath):
         
