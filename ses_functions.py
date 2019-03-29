@@ -45,13 +45,6 @@ class SESFunctions:
                 'acq_point_intensity':(self.sesdll.GetAcquiredDataDouble, ctypes.c_double),
                 'acq_channel_intensity':(self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
                 }
-        return_type_for_function = {self.sesdll.GetAcquiredDataDouble : ctypes.c_double,
-                                    self.sesdll.GetAcquiredDataInteger : ctypes.c_int,
-                                    self.sesdll.GetAcquiredDataVectorDouble : ctypes.c_double,
-                                    self.sesdll.GetAcquiredDataVectorInt32 : ctypes.c_int}
-        
-        self.acq_returntype = {k : return_type_for_function[v] for k,v in self.acq_funcs.items()}
-        
         
         
         
