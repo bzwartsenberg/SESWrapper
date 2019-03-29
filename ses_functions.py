@@ -208,7 +208,19 @@ class SESFunctions:
             print('Continuing acquisition')
             
         self.e.error(self.sesdll.ContinueAcquisition())
-          
+        
+    def StopAcquisition(self):
+        """Stop the acquisition.
+        Args:
+            None
+        Returns:
+            None
+            """
+        if self.verbose:
+            print('Stopping acquisition')
+            
+        self.e.error(self.sesdll.StopAcquisition())
+                  
         
     def GetAcquiredData(self, name):
         """Get acquired data

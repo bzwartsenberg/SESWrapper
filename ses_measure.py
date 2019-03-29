@@ -96,6 +96,9 @@ class SESMeasure:
         channel_scale = self.ses.GetAcquiredDataArray('acq_channel_scale', channels, data = None)
         
         
+        print('Stopping Acquisition')
+        self.ses.StopAcquisition()
+        
         data = data.reshape((slices, channels))
         
         if path is not None:

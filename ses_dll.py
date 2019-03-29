@@ -177,6 +177,15 @@ class SESdll:
         funcparams = ()
         self.ContinueAcquisition = funcproto(('WRP_ContinueAcquisition',self.sesdll),funcparams)
                 
+        ####### stopAcquisition:
+        
+        funcproto = ctypes.WINFUNCTYPE(
+                                         ctypes.c_int,
+                                         )        
+        
+        funcparams = ()
+        self.StopAcquisition = funcproto(('WRP_StopAcquisition',self.sesdll),funcparams)
+        
 
 
         ####### GetAcquiredDataDouble:
