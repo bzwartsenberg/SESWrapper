@@ -117,7 +117,9 @@ class SESMeasure:
             ## move motors:
             for ax, v_arr in paths.items():                
                 print('Moving motor {} to {:d}'.format(ax, v_arr[i]))
-                self.motorcontrol.move_axis(self, ax, v_arr[i], s = 0.1)
+                r = self.motorcontrol.move_axis(self, ax, v_arr[i], s = 0.1)
+                print('Response was:')
+                self.motorcontrol.printresponse(r)
             print('Taking image:')
             
             data_step = self.MeasureAnalyzerRegion(region.copy(), data = None, 
@@ -150,3 +152,4 @@ class SESMeasure:
     
     
     
+a
