@@ -29,7 +29,7 @@ class SESMeasure:
         ## Note: change ini file here
         self.ini_path = ses_dir + '/ini/DetectorGraph.ini'
         config = ConfigParser()
-        config.read(ini_path)
+        config.read(self.ini_path)
         self.save_direct_viewer = config['global']['direct_viewer']
         self.save_network_viewer = config['global']['network_viewer']
         config['global']['direct_viewer'] = 'false'
