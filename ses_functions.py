@@ -27,23 +27,23 @@ class SESFunctions:
         self.verbose = verbose
         self.e = SESError(verbose = self.verbose)
         self.acq_funcs = {
-                'acq_channels' : self.sesdll.GetAcquiredDataInteger,
-                'acq_slices' : self.sesdll.GetAcquiredDataInteger,
-                'acq_iterations' : self.sesdll.GetAcquiredDataInteger,
+                'acq_channels' : (self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
+                'acq_slices' : (self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
+                'acq_iterations' : (self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
                 'acq_intensity_unit':self.sesdll.GetAcquiredDataString,
                 'acq_channel_unit':self.sesdll.GetAcquiredDataString,
                 'acq_slice_unit':self.sesdll.GetAcquiredDataString,
-                'acq_spectrum' : self.sesdll.GetAcquiredDataVectorDouble,
-                'acq_slice' : self.sesdll.GetAcquiredDataVectorDouble,
-                'acq_image' : self.sesdll.GetAcquiredDataVectorDouble,
-                'acq_channel_scale':self.sesdll.GetAcquiredDataVectorDouble,
-                'acq_slice_scale':self.sesdll.GetAcquiredDataVectorDouble,
-                'acq_raw_image':self.sesdll.GetAcquiredDataVectorInt32,
-                'acq_current_step':self.sesdll.GetAcquiredDataInteger,
-                'acq_elapsed_time':self.sesdll.GetAcquiredDataDouble,
-                'acq_current_point':self.sesdll.GetAcquiredDataInteger,
-                'acq_point_intensity':self.sesdll.GetAcquiredDataDouble,
-                'acq_channel_intensity':self.sesdll.GetAcquiredDataVectorDouble,
+                'acq_spectrum' : (self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
+                'acq_slice' : (self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
+                'acq_image' : (self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
+                'acq_channel_scale':(self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
+                'acq_slice_scale':(self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
+                'acq_raw_image':(self.sesdll.GetAcquiredDataVectorInt32, ctypes.c_int),
+                'acq_current_step':(self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
+                'acq_elapsed_time':(self.sesdll.GetAcquiredDataDouble, ctypes.c_double),
+                'acq_current_point':(self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
+                'acq_point_intensity':(self.sesdll.GetAcquiredDataDouble, ctypes.c_double),
+                'acq_channel_intensity':(self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
                 }
         return_type_for_function = {self.sesdll.GetAcquiredDataDouble : ctypes.c_double,
                                     self.sesdll.GetAcquiredDataInteger : ctypes.c_int,
@@ -232,10 +232,11 @@ class SESFunctions:
         if self.verbose:
             print('Getting datapoint')
             
-        returnvar = self.acq_returntype[name](0)
+        func, returntype = self.acq_funcs[name]
+        returnvar = returntype(0)
         returnsize = ctypes.c_int(0)
         nameb = name.encode('ASCII')
-        self.e.error(self.acq_funcs[name](nameb, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
+        self.e.error(func(nameb, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
         
         return returnvar.value
             
@@ -251,10 +252,12 @@ class SESFunctions:
         if self.verbose:
             print('Getting data array')
             
-        returnarray = (ctypes.c_double * size)()
+        func, returntype = self.acq_funcs[name]
+            
+        returnarray = (returntype * size)()
         returnsize = ctypes.c_int(size)
         nameb = name.encode('ASCII')
-        self.e.error(self.acq_funcs[name](nameb, index, returnarray, ctypes.byref(returnsize)))
+        self.e.error(func(nameb, index, returnarray, ctypes.byref(returnsize)))
         
         if data is None:
             data = np.array(returnarray)
