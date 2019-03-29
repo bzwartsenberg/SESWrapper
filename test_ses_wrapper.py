@@ -37,6 +37,7 @@ if __name__ == '__main__':
               'pass_energy' : 10.,
               'sweeps' : 2}
     
+    
     data, slice_scale, channel_scale = sm.MeasureAnalyzerRegion(region, data = None, 
                             updatefreq = 'slice',  path = None)
     

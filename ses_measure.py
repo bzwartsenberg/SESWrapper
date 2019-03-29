@@ -134,8 +134,8 @@ class SESMeasure:
                                                    updatefreq = 'slice', 
                                                     path = None)
             if i == 0:
-                data = np.zeros((data_step.shape[0],n_steps))
-            data[:,i] = data_step
+                data = np.zeros(data_step.shape + tuple(n_steps))
+            data[:,:,i] = data_step
             
             
         return data, slice_scale, channel_scale
