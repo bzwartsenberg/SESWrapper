@@ -27,20 +27,30 @@ class SESFunctions:
         self.verbose = verbose
         self.e = SESError(verbose = self.verbose)
         self.acq_funcs = {
+                'acq_channels' : self.sesdll.GetAcquiredDataInteger,
+                'acq_slices' : self.sesdll.GetAcquiredDataInteger,
+                'acq_iterations' : self.sesdll.GetAcquiredDataInteger,
+                'acq_intensity_unit':self.sesdll.GetAcquiredDataString,
+                'acq_channel_unit':self.sesdll.GetAcquiredDataString,
+                'acq_slice_unit':self.sesdll.GetAcquiredDataString,
                 'acq_spectrum' : self.sesdll.GetAcquiredDataVectorDouble,
                 'acq_slice' : self.sesdll.GetAcquiredDataVectorDouble,
                 'acq_image' : self.sesdll.GetAcquiredDataVectorDouble,
-                'acq_channels' : self.sesdll.GetAcquiredDataInteger,
-                'acq_slices' : self.sesdll.GetAcquiredDataInteger,
+                'acq_channel_scale':self.sesdll.GetAcquiredDataVectorDouble,
+                'acq_slice_scale':self.sesdll.GetAcquiredDataVectorDouble,
+                'acq_raw_image':self.sesdll.GetAcquiredDataVectorInt32,
+                'acq_current_step':self.sesdll.GetAcquiredDataInteger,
+                'acq_elapsed_time':self.sesdll.GetAcquiredDataDouble,
+                'acq_current_point':self.sesdll.GetAcquiredDataInteger,
+                'acq_point_intensity':self.sesdll.GetAcquiredDataDouble,
+                'acq_channel_intensity':self.sesdll.GetAcquiredDataVectorDouble,
                 }
+        return_type_for_function = {self.sesdll.GetAcquiredDataDouble : ctypes.c_double,
+                                    self.sesdll.GetAcquiredDataInteger : ctypes.c_int,
+                                    self.sesdll.GetAcquiredDataVectorDouble : ctypes.c_double,
+                                    self.sesdll.GetAcquiredDataVectorInt32 : ctypes.c_int}
         
-        self.acq_returntype = {
-                'acq_spectrum' : ctypes.c_double,
-                'acq_slice' : ctypes.c_double,
-                'acq_image' : ctypes.c_double,
-                'acq_channels' : ctypes.c_int,
-                'acq_slices' : ctypes.c_int,                
-                }
+        self.acq_returntype = {k : return_type_for_function[v] for k,v in self.acq_funcs.items()}
         
         
         
@@ -240,6 +250,23 @@ class SESFunctions:
             np.copyto(np.array(returnarray),data)
         
         return data
+    
+    
+    def GetAcquiredDataString(self, name):
+        """Get acquired data
+        Args:
+            name: parameter name
+        """            
+        if self.verbose:
+            print('Getting string')
+            
+        returnarray = ctypes.create_string_buffer(2000)
+        returnsize = ctypes.c_int(2000)
+        nameb = name.encode('ASCII')
+        self.e.error(self.acq_funcs[name](nameb, 0, returnarray, ctypes.byref(returnsize)))
+        
+        
+        return returnarray.value.decode('ASCII')    
     
     def Finalize(self):
         """Finalize the instrument

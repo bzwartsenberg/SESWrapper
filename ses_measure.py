@@ -92,37 +92,42 @@ class SESMeasure:
             self.ses.ContinueAcquisition()
 
         data = self.ses.GetAcquiredDataArray('acq_image', data_size, data = None)
+        slice_scale = self.ses.GetAcquiredDataArray('acq_slice_scale', slices, data = None)
+        channel_scale = self.ses.GetAcquiredDataArray('acq_channel_scale', channels, data = None)
+        
+        
+        data = data.reshape((slices, channels))
         
         if path is not None:
             np.savetxt(path, data)
             
-        return data
+        return data, slice_scale, channel_scale
         
     
     
     
-    def MeasureWithMotors(self, region, paths):
+    def MeasureWithMotors(self, region, motor_paths):
         """
         region: see above
-        paths: dictionary of axis name and array of values: 'P' : np.array([0, 0.5,1.0])
+        motor_paths: dictionary of axis name and array of values: 'P' : np.array([0, 0.5,1.0])
                Assumed to all be the same length
         """
         if self.motorcontrol is None:
             print('Please give motorcontrol object')
             
-        n_steps = next(iter(paths.values()))
+        n_steps = next(iter(motor_paths.values()))
         
         for i in range(n_steps):
             print('Taking step ', i)
             ## move motors:
-            for ax, v_arr in paths.items():                
+            for ax, v_arr in motor_paths.items():                
                 print('Moving motor {} to {:d}'.format(ax, v_arr[i]))
                 r = self.motorcontrol.move_axis(self, ax, v_arr[i], s = 0.1)
                 print('Response was:')
                 self.motorcontrol.printresponse(r)
             print('Taking image:')
             
-            data_step = self.MeasureAnalyzerRegion(region.copy(), data = None, 
+            data_step, slice_scale, channel_scale = self.MeasureAnalyzerRegion(region.copy(), data = None, 
                                                    updatefreq = 'slice', 
                                                     path = None)
             if i == 0:
@@ -130,7 +135,7 @@ class SESMeasure:
             data[:,i] = data_step
             
             
-        return data
+        return data, slice_scale, channel_scale
     
     
     def Finalize(self):
@@ -152,4 +157,3 @@ class SESMeasure:
     
     
     
-a
