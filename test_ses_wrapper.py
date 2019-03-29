@@ -41,6 +41,9 @@ if __name__ == '__main__':
                               path = None)
     
     
+    sm.Finalize()
+    
+    
     
     
     

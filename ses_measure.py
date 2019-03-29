@@ -8,13 +8,15 @@ Created on Thu Mar 28 08:45:42 2019
 
 import numpy as np
 from ses_functions import SESFunctions
+from configparser import ConfigParser
 
 class SESMeasure:
     
     
     def __init__(self, dllpath, ses_dir, ses_instrument = '', inst_path = '' , 
-                 verbose = False, element_set = 'High Pass (UPS)'):
+                 verbose = False, element_set = 'High Pass (UPS)', motorcontrol = None):
         """
+        
         
         """
         
@@ -25,15 +27,28 @@ class SESMeasure:
         self.ses.SetProperty('instrument_library', ses_instrument)
         
         ## Note: change ini file here
+        self.ini_path = ses_dir + '/ini/DetectorGraph.ini'
+        config = ConfigParser()
+        config.read(ini_path)
+        self.save_direct_viewer = config['global']['direct_viewer']
+        self.save_network_viewer = config['global']['network_viewer']
+        config['global']['direct_viewer'] = 'false'
+        config['global']['network_viewer'] = 'true'
+        with open(self.ini_path, 'w') as configfile:
+            config.write(configfile)        
+        
+        
         self.ses.Initialize()
         
         self.ses.LoadInstrument(inst_path)
         
         self.ses.SetProperty('element_set', element_set)
         
+        self.motorcontrol = motorcontrol
+        
         
             
-    def __enter__(self, test): ##for syntax like "with ses = SES():"
+    def __enter__(self, test): ##for syntax like "with SES() as ses:"
         pass
     
     
@@ -47,14 +62,14 @@ class SESMeasure:
     
     def MeasureAnalyzerRegion(self, region, data = None, updatefreq = 'slice', 
                               path = None):
-        """region is a dictionary of parameters
-        data is a np array that gets written to
-        
-        updatefreq is the update frequency with which data gets updated
-        
-        Estart, Eend
-        Estep, etc
-        path is used to save"""
+        """
+        Measure a region with SES.
+        Args:
+            region: is a dictionary of parameters
+            data:  np array that gets written to (not implemented yet)
+            updatefreq: is the update frequency with which data gets updated
+                        (not implemented yet)
+            path: filename that data is written to, only written if not None"""
         
         sweeps = region.pop('sweeps')
                 
@@ -63,22 +78,20 @@ class SESMeasure:
 
         self.ses.SetAnalyzerRegion(region)
         
-        self.InitAcquisition(False, True)
+        self.ses.InitAcquisition(False, True)
 
         channels = self.ses.GetAcquiredData('acq_channels')
         slices = self.ses.GetAcquiredData('acq_slices')
         
         data_size = channels*slices
-        
-        data = np.zeros(data_size)
-        
+                
 
         for i in range(sweeps):
             self.ses.StartAcquisition()
             self.ses.WaitForRegionReady(-1)
-            self.ContinueAcquisition()
+            self.ses.ContinueAcquisition()
 
-        data = self.ses.GetAcquiredDataArray('acq_image', data_size, data = data)
+        data = self.ses.GetAcquiredDataArray('acq_image', data_size, data = None)
         
         if path is not None:
             np.savetxt(path, data)
@@ -88,13 +101,48 @@ class SESMeasure:
     
     
     
-    def MeasureWithMotors(self, region, motors):
+    def MeasureWithMotors(self, region, paths):
         """
         region: see above
-        motors: dictionary of axis name and array of values: 'P' : np.array([0, 0.5,1.0])
+        paths: dictionary of axis name and array of values: 'P' : np.array([0, 0.5,1.0])
+               Assumed to all be the same length
         """
-        pass
+        if self.motorcontrol is None:
+            print('Please give motorcontrol object')
+            
+        n_steps = next(iter(paths.values()))
+        
+        for i in range(n_steps):
+            print('Taking step ', i)
+            ## move motors:
+            for ax, v_arr in paths.items():                
+                print('Moving motor {} to {:d}'.format(ax, v_arr[i]))
+                self.motorcontrol.move_axis(self, ax, v_arr[i], s = 0.1)
+            print('Taking image:')
+            
+            data_step = self.MeasureAnalyzerRegion(region.copy(), data = None, 
+                                                   updatefreq = 'slice', 
+                                                    path = None)
+            if i == 0:
+                data = np.zeros((data_step.shape[0],n_steps))
+            data[:,i] = data_step
+            
+            
+        return data
     
+    
+    def Finalize(self):
+        
+        ## Note: change ini file here
+        
+        self.ses.Finalize()
+        
+        config = ConfigParser()
+        config.read(self.ini_path)
+        config['global']['direct_viewer'] = self.save_direct_viewer
+        config['global']['network_viewer'] = self.save_network_viewer
+        with open(self.ini_path, 'w') as configfile:
+            config.write(configfile)           
     
     
     
