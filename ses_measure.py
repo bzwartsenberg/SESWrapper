@@ -63,12 +63,15 @@ class SESMeasure:
 
         self.ses.SetAnalyzerRegion(region)
         
+        self.InitAcquisition(False, True)
+
         channels = self.ses.GetAcquiredData('acq_channels')
         slices = self.ses.GetAcquiredData('acq_slices')
         
         data_size = channels*slices
         
         data = np.zeros(data_size)
+        
 
         for i in range(sweeps):
             self.ses.StartAcquisition()

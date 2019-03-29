@@ -41,7 +41,8 @@ class SESError:
                         9 : RuntimeError('ERR_NOT_IMPLEMENTED'),
                        }
       
-        self.warnings = {}
+        self.warnings = {313 : 'Failed to zero supplies',
+                         }
     
     def error(self, intcode):
         
