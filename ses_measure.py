@@ -118,23 +118,23 @@ class SESMeasure:
         if self.motorcontrol is None:
             print('Please give motorcontrol object')
             
-        n_steps = next(iter(motor_paths.values()))
+        n_steps = next(iter(motor_paths.values())).size
         
         for i in range(n_steps):
             print('Taking step ', i)
             ## move motors:
             for ax, v_arr in motor_paths.items():                
-                print('Moving motor {} to {:d}'.format(ax, v_arr[i]))
-                r = self.motorcontrol.move_axis(self, ax, v_arr[i], s = 0.1)
+                print('Moving motor {} to {:.2f}'.format(ax, v_arr[i]))
+                r = self.motorcontrol.move_axis(ax, v_arr[i], s = 0.1)
                 print('Response was:')
-                self.motorcontrol.printresponse(r)
+                self.motorcontrol.print_response(r)
             print('Taking image:')
             
             data_step, slice_scale, channel_scale = self.MeasureAnalyzerRegion(region.copy(), data = None, 
                                                    updatefreq = 'slice', 
                                                     path = None)
             if i == 0:
-                data = np.zeros(data_step.shape + tuple(n_steps))
+                data = np.zeros(data_step.shape + (n_steps,))
             data[:,:,i] = data_step
             
             
