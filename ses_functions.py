@@ -329,6 +329,30 @@ class SESFunctions:
 
 
         
+    def CheckAnalyzerRegion(self, analyzer_dict):
+        """Take a dictionary of analyzer parameters, check the region, return the
+        number of steps taken, minimum dwell time per step, minimum energy step.
+        Args:
+            analyzer_dict: dictionary of parameters
+        Returns: (tuple of:)
+            nsteps
+            time_ms
+            min_energy_step_ev
+            """
+            
+        if self.verbose:
+            print('Checking Analyzer region')
+            
+        analyzer = AnalyzerRegion(paramdict = analyzer_dict)
+        
+        nsteps = ctypes.c_int(0)
+        time_ms = ctypes.c_double(0)
+        min_energy_step_ev = ctypes.c_double(0)
+        
+        
+        self.e.error(self.sesdll.CheckAnalyzerRegion(analyzer, ctypes.byref(nsteps),ctypes.byref(time_ms),ctypes.byref(min_energy_step_ev)))        
+        
+        return nsteps.value,time_ms.value,min_energy_step_ev.value
         
         
     def GetDetectorInfo(self):
@@ -431,7 +455,7 @@ class SESFunctions:
         self.e.error(self.sesdll.StartAcquisition())
         
     def WaitForRegionReady(self, timeout_time):
-        """Start the acquisition.
+        """Returns when the region is ready.
         Args:
             timeout_time: -1 is infinite
         Returns:
@@ -442,7 +466,21 @@ class SESFunctions:
         
         timeout_time = ctypes.c_int(timeout_time)
         self.e.error(self.sesdll.WaitForRegionReady(timeout_time))
-
+        
+    def WaitForPointReady(self, timeout_time):
+        """Wait for point to be ready. When used in fixed mode, this will not return
+        until time_out time is reached.
+        Args:
+            timeout_time: -1 is infinite
+        Returns:
+            None
+            """
+        if self.verbose:
+            print('Waiting for point')
+        
+        timeout_time = ctypes.c_int(timeout_time)
+        self.e.error(self.sesdll.WaitForPointReady(timeout_time))
+        
     def ContinueAcquisition(self):
         """Start the acquisition.
         Args:
