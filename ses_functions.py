@@ -30,9 +30,9 @@ class SESFunctions:
                 'acq_channels' : (self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
                 'acq_slices' : (self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
                 'acq_iterations' : (self.sesdll.GetAcquiredDataInteger,ctypes.c_int),
-                'acq_intensity_unit':self.sesdll.GetAcquiredDataString,
-                'acq_channel_unit':self.sesdll.GetAcquiredDataString,
-                'acq_slice_unit':self.sesdll.GetAcquiredDataString,
+                'acq_intensity_unit':(self.sesdll.GetAcquiredDataString,ctypes.c_char_p),
+                'acq_channel_unit':(self.sesdll.GetAcquiredDataString,ctypes.c_char_p),
+                'acq_slice_unit':(self.sesdll.GetAcquiredDataString,ctypes.c_char_p),
                 'acq_spectrum' : (self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
                 'acq_slice' : (self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
                 'acq_image' : (self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
@@ -45,6 +45,48 @@ class SESFunctions:
                 'acq_point_intensity':(self.sesdll.GetAcquiredDataDouble, ctypes.c_double),
                 'acq_channel_intensity':(self.sesdll.GetAcquiredDataVectorDouble, ctypes.c_double),
                 }
+        
+        self.property_funcs = {
+                'lib_description' :(self.sesdll.GetPropertyString,ctypes.c_char_p),
+                'lib_version' : (self.sesdll.GetPropertyString,ctypes.c_char_p),
+                'lib_error' : (self.sesdll.GetPropertyString,ctypes.c_char_p),
+                'lib_working_dir':(self.sesdll.GetPropertyString,ctypes.c_char_p),
+                'instrument_library':(self.sesdll.GetPropertyString,ctypes.c_char_p),
+                'instrument_status':(self.sesdll.GetPropertyInteger,ctypes.c_int),
+                
+                'always_delay_region' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+                'allow_io_with_detector' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+                
+                'instrument_model' : (self.sesdll.GetPropertyString, ctypes.c_char_p),
+                'instrument_serial_no':(self.sesdll.GetPropertyString, ctypes.c_char_p),
+                
+#                'detector_info':(self.sesdll.GetPropertyDouble, ctypes.c_double), ## Not mapped, use GetDetectorInfo
+#                'detector_region':(self.sesdll.GetPropertyDouble, ctypes.c_double), ##Not mapped, use GetDetectorRegion
+                
+                'element_set_count':(self.sesdll.GetPropertyInteger,ctypes.c_int),
+                'element_set':(self.sesdll.GetPropertyString,ctypes.c_char_p),
+                
+                'element_name_count':(self.sesdll.GetPropertyInteger,ctypes.c_int),
+                'element_name':(self.sesdll.GetPropertyString,ctypes.c_char_p),
+                
+                'lens_mode_count':(self.sesdll.GetPropertyInteger,ctypes.c_int),
+                'lens_mode':(self.sesdll.GetPropertyString,ctypes.c_char_p),
+                
+                'pass_energy_count':(self.sesdll.GetPropertyInteger,ctypes.c_int),
+                'pass_energy':(self.sesdll.GetPropertyDouble,ctypes.c_double),
+                
+
+#                'analyzer_region':(self.sesdll.GetPropertyDouble,ctypes.c_double), ###Not mapped: use GetAnalyzerRegion
+                
+                'use_external_io' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+                'use_detector' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+                'use_spin' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+                'region_name' : (self.sesdll.GetPropertyString, ctypes.c_char_p),
+                'temp_file_name' : (self.sesdll.GetPropertyString, ctypes.c_char_p),
+                'reset_data_between_iterations' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+                'use_binding_energy' : (self.sesdll.GetPropertyBool, ctypes.c_bool),
+
+                }        
         
         
         
@@ -59,10 +101,40 @@ class SESFunctions:
         
         self.e.error(self.sesdll.Initialize(0)) ##0 is a standard parameter
         
+                
+    def GetProperty(self, name):
+        """Get property data
+        Args:
+            name: parameter name
+        Returns:
+            value of paramter
+            """
+        if self.verbose:
+            print('Getting property')
+            
+        func, returntype = self.property_funcs[name]
+        
+        if returntype == ctypes.c_char_p:
+            if self.verbose:
+                print('Getting property ',name, ' of string type')
+            returnarray = ctypes.create_string_buffer(2000)
+            returnsize = ctypes.c_int(2000)
+            nameb = name.encode('ASCII')
+            self.e.error(func(nameb, 0, returnarray, ctypes.byref(returnsize)))
+            return returnarray.value.decode('ASCII')    
+        else:
+            if self.verbose:
+                print('Getting property ', name, ' of type ', returntype)
+            returnvar = returntype(0)
+            returnsize = ctypes.c_int(0)
+            nameb = name.encode('ASCII')
+            self.e.error(func(nameb, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
+            
+            return returnvar.value    
         
         
     def SetProperty(self, pname, value):
-        """Initialize the SES software
+        """Set a property
         Args:
             pname: property name
             pvalue: value
@@ -223,16 +295,28 @@ class SESFunctions:
             value of paramter
             """
         if self.verbose:
-            print('Getting datapoint')
+            print('Getting data')
             
         func, returntype = self.acq_funcs[name]
-        returnvar = returntype(0)
-        returnsize = ctypes.c_int(0)
-        nameb = name.encode('ASCII')
-        self.e.error(func(nameb, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
         
-        return returnvar.value
+        if returntype == ctypes.c_char_p:
+            if self.verbose:
+                print('Getting data ',name, ' of string type')
+            returnarray = ctypes.create_string_buffer(2000)
+            returnsize = ctypes.c_int(2000)
+            nameb = name.encode('ASCII')
+            self.e.error(func(nameb, 0, returnarray, ctypes.byref(returnsize)))
+            return returnarray.value.decode('ASCII')    
+        else:
+            if self.verbose:
+                print('Getting data ', name, ' of type ', returntype)
+            returnvar = returntype(0)
+            returnsize = ctypes.c_int(0)
+            nameb = name.encode('ASCII')
+            self.e.error(func(nameb, 0, ctypes.byref(returnvar), ctypes.byref(returnsize)))
             
+            return returnvar.value            
+                    
 
     def GetAcquiredDataArray(self, name, size, data = None, index = 0):
         """Get acquired data
@@ -259,37 +343,7 @@ class SESFunctions:
         
         return data
     
-    
-    def GetAcquiredDataString(self, name):
-        """Get acquired data
-        Args:
-            name: parameter name
-        """            
-        if self.verbose:
-            print('Getting string')
-            
-        returnarray = ctypes.create_string_buffer(2000)
-        returnsize = ctypes.c_int(2000)
-        nameb = name.encode('ASCII')
-        self.e.error(self.acq_funcs[name](nameb, 0, returnarray, ctypes.byref(returnsize)))
-        
-        
-        return returnarray.value.decode('ASCII')    
-    
-    def GetPropertyString(self, name):
-        """Get property
-        Args:
-            name: parameter name
-        """            
-        if self.verbose:
-            print('Getting string')
-            
-        returnarray = ctypes.create_string_buffer(2000)
-        returnsize = ctypes.c_int(2000)
-        nameb = name.encode('ASCII')
-        self.e.error(self.GetPropertyString(nameb, 0, returnarray, ctypes.byref(returnsize)))
-        
-        return returnarray.value.decode('ASCII')       
+   
     
     
     def Finalize(self):
