@@ -327,25 +327,28 @@ class SESdll:
         funcparams = ((1,'excitation_energy'))
         self.SetExcitationEnergy = funcproto(('WRP_SetExcitationEnergy',self.sesdll),funcparams)
                   
-        ####### GetElementEnergy:
+        ####### GetElementVoltage:
+        
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         ctypes.POINTER(ctypes.c_double), #element_energy
+                                         ctypes.c_char_p, #element name                                         
+                                         ctypes.POINTER(ctypes.c_double), #element_voltage
                                          )        
                 
-        funcparams = ((1,'element_energy'))
-        self.GetElementEnergy = funcproto(('WRP_GetElementEnergy',self.sesdll),funcparams)
+        funcparams = ((1,'element_name'),(1,'element_voltage'))
+        self.GetElementVoltage = funcproto(('WRP_GetElementVoltage',self.sesdll),funcparams)
           
         ####### SetElementEnergy:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
-                                         ctypes.c_double, #element_energy
+                                         ctypes.c_char_p, #element name                                                                                  
+                                         ctypes.c_double, #element_voltage
                                          )        
                 
-        funcparams = ((1,'element_energy'))
-        self.ElementEnergy = funcproto(('WRP_ElementEnergy',self.sesdll),funcparams)
+        funcparams = ((1,'element_name'),(1,'element_voltage'))
+        self.SetElementVoltage = funcproto(('WRP_ElementVoltage',self.sesdll),funcparams)
                   
 
         ####### CheckAnalyzerRegion:

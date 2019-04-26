@@ -141,15 +141,14 @@ class SESFunctions:
         Returns:
             None
             """
-
-
             
         if type(value) == int:
             if self.verbose:
                 print('Setting int property')    
             value = ctypes.c_int(value)
             pname = pname.encode('ASCII')            
-            self.e.error(self.sesdll.SetPropertyInteger(pname, -1, ctypes.byref(value))) ##middle argument is size
+            #Note: not sure about the -1 for size, using what is in the tutorial for SESwrapper
+            self.e.error(self.sesdll.SetPropertyInteger(pname, -1, ctypes.byref(value))) ##middle argument is size, 
         if type(value) == float:
             if self.verbose:
                 print('Setting double/float property')    
@@ -163,7 +162,51 @@ class SESFunctions:
             pname = pname.encode('ASCII')            
             self.e.error(self.sesdll.SetPropertyString(pname, 0, value)) ##middle argument is size
             
-                    
+                
+    def Validate(self, element_set, lens_mode, pass_energy, kinetic_energy):
+        """Validate the selected parameters, raise error if wrong
+        Args:
+            element_set: element set (string)
+            lens_mode: lens mode (string)
+            pass_energy: pass energy (float)
+            kinetic_energy: kinetic energy (float)
+        Returns:
+            None
+            """
+        if self.verbose: print(self.verbose('Validating'))
+
+        element_set = element_set.encode('ASCII')            
+        lens_mode = lens_mode.encode('ASCII')            
+
+
+        self.e.error(self.sesdll.Validate(element_set, lens_mode, pass_energy, kinetic_energy)) 
+
+        if self.verbose: print(self.verbose('Validation OK'))
+
+    def ResetHW(self):
+        """Reset the hardware.
+        Args:
+            None
+        Returns:
+            None
+            """
+        if self.verbose:
+            print('Resetting hardware')
+            
+        self.e.error(self.sesdll.ResetHW())
+        
+    def TestHW(self):
+        """Test the hardware.
+        Args:
+            None
+        Returns:
+            None
+            """
+        if self.verbose:
+            print('Testing hardware')
+            
+        self.e.error(self.sesdll.TestHW())   
+        
         
     def LoadInstrument(self, instrumentpath):
         """Load the instrument dat file
@@ -177,6 +220,115 @@ class SESFunctions:
             
         instrumentpath = instrumentpath.encode('ASCII')
         self.e.error(self.sesdll.LoadInstrument(instrumentpath))
+        
+        
+    def ZeroSupplies(self):
+        """Zero supplies.
+        Args:
+            None
+        Returns:
+            None
+            """
+        if self.verbose:
+            print('Zeroing supplies')
+            
+        self.e.error(self.sesdll.ZeroSupplies())    
+        
+        
+    def GetBindingEnergy(self):
+        """Get the binding energy.
+        Returns:
+            binding energy
+            """        
+        if self.verbose: print(self.verbose('Getting binding energy'))
+            
+        returnvar = ctypes.c_double(0)
+        self.e.error(self.sesdll.GetBindingEnergy(ctypes.byref(returnvar)))
+        
+        return returnvar.value
+    
+    def SetBindingEnergy(self, binding_energy):
+        """Get the binding energy.
+        Args:
+            binding_energy: float with binding energy
+            """        
+        if self.verbose: print(self.verbose('Setting binding energy'))
+            
+        self.e.error(self.sesdll.SetBindingEnergy(binding_energy))
+        
+    def GetKineticEnergy(self):
+        """Get the kinetic energy.
+        Returns:
+            kinetic energy
+            """        
+        if self.verbose: print(self.verbose('Getting kinetic energy'))
+            
+        returnvar = ctypes.c_double(0)
+        self.e.error(self.sesdll.GetKineticEnergy(ctypes.byref(returnvar)))
+        
+        return returnvar.value
+    
+    def SetKineticEnergy(self, kinetic_energy):
+        """Get the kinetic energy.
+        Args:
+            kinetic_energy: float with kinetic energy
+            """        
+        if self.verbose: print(self.verbose('Setting kinetic energy'))
+            
+        self.e.error(self.sesdll.SetKineticEnergy(kinetic_energy))
+        
+    def GetExcitationEnergy(self):
+        """Get the excitation energy.
+        Returns:
+            excitation energy
+            """        
+        if self.verbose: print(self.verbose('Getting excitation energy'))
+            
+        returnvar = ctypes.c_double(0)
+        self.e.error(self.sesdll.GetExcitationEnergy(ctypes.byref(returnvar)))
+        
+        return returnvar.value
+    
+    def SetExcitationEnergy(self, excitation_energy):
+        """Get the excitation energy.
+        Args:
+            excitation_energy: float with excitation energy
+            """        
+        if self.verbose: print(self.verbose('Setting excitation energy'))
+            
+        self.e.error(self.sesdll.SetExcitationEnergy(excitation_energy))
+
+
+    def GetElementVoltage(self, element_name):
+        """Get the element voltage.
+        Args:
+            element_name: name of the element
+        Returns:
+             element voltage
+            """        
+        if self.verbose: print(self.verbose('Getting element voltage ', element_name))
+        
+        element_name = element_name.encode('ASCII')                    
+        
+        returnvar = ctypes.c_double(0)
+        self.e.error(self.sesdll.GetElementVoltage(element_name, ctypes.byref(returnvar)))
+        
+        return returnvar.value
+    
+    
+    def SetElementVoltage(self,element_name, element_voltage):
+        """Get the element voltage.
+        Args:
+            element_voltage: float with excitation energy
+            element_name: name of the element
+            """        
+        if self.verbose: print(self.verbose('Setting element voltage of ', element_name))
+        element_name = element_name.encode('ASCII')                    
+            
+        self.e.error(self.sesdll.SetElementVoltage(element_name,element_voltage))
+
+
+        
         
         
     def GetDetectorInfo(self):
@@ -221,6 +373,35 @@ class SESFunctions:
         self.e.error(self.sesdll.GetAnalyzerRegion(analyzer))        
         
         return dict(analyzer)
+    
+    def SetDetectorRegion(self, detector_dict):
+        """Take a dictionary of parameters and set the region
+        Args:
+            detector_dict: dictionary of parameters describing detector region"""
+            
+        if self.verbose:
+            print('Setting Detector region')
+            
+        detector = DetectorRegion(paramdict = detector_dict)
+        
+        self.e.error(self.sesdll.SetDetectorRegion(detector))
+        
+
+    def GetDetectorRegion(self):
+        """Get the current detector region
+        Args:
+            None
+        Returns:
+            Detector dictionary paramter"""             
+            
+        if self.verbose:
+            print('Getting Detector region')            
+            
+        detector = DetectorRegion()
+        self.e.error(self.sesdll.SetDetectorRegion(detector))        
+        
+        return dict(detector)    
+    
 
     def InitAcquisition(self, blockpointready, blockregionready):
         """Initialize the acquisition.
