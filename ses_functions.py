@@ -23,7 +23,7 @@ class SESFunctions:
     def __init__(self, dllpath, verbose = False):
         
         
-        self.sesdll = SESdll(dllpath) ## note: finalize this dll
+        self.sesdll = SESdll(dllpath) ## note: close this dll
         self.verbose = verbose
         self.e = SESError(verbose = self.verbose)
         self.acq_funcs = {
@@ -275,6 +275,22 @@ class SESFunctions:
         
         
         return returnarray.value.decode('ASCII')    
+    
+    def GetPropertyString(self, name):
+        """Get property
+        Args:
+            name: parameter name
+        """            
+        if self.verbose:
+            print('Getting string')
+            
+        returnarray = ctypes.create_string_buffer(2000)
+        returnsize = ctypes.c_int(2000)
+        nameb = name.encode('ASCII')
+        self.e.error(self.GetPropertyString(nameb, 0, returnarray, ctypes.byref(returnsize)))
+        
+        return returnarray.value.decode('ASCII')       
+    
     
     def Finalize(self):
         """Finalize the instrument
