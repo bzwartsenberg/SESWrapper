@@ -274,7 +274,7 @@ class SESdll:
                                          ctypes.POINTER(ctypes.c_double), #bindingEnergy
                                          )        
                 
-        funcparams = ((1,'binding_energy'))
+        funcparams = ((1,'binding_energy'),)
         self.GetBindingEnergy = funcproto(('WRP_GetBindingEnergy',self.sesdll),funcparams)
           
         ####### Setbinding Energy:
@@ -284,7 +284,7 @@ class SESdll:
                                          ctypes.c_double, #bindingEnergy
                                          )        
                 
-        funcparams = ((1,'binding_energy'))
+        funcparams = ((1,'binding_energy'),)
         self.SetBindingEnergy = funcproto(('WRP_SetBindingEnergy',self.sesdll),funcparams)
  
         ####### GetKineticEnergy:
@@ -294,7 +294,7 @@ class SESdll:
                                          ctypes.POINTER(ctypes.c_double), #kineticEnergy
                                          )        
                 
-        funcparams = ((1,'kinetic_energy'))
+        funcparams = ((1,'kinetic_energy'),)
         self.GetKineticEnergy = funcproto(('WRP_GetKineticEnergy',self.sesdll),funcparams)
           
         ####### SetKineticEnergy:
@@ -304,7 +304,7 @@ class SESdll:
                                          ctypes.c_double, #KineticEnergy
                                          )        
                 
-        funcparams = ((1,'kinetic_energy'))
+        funcparams = ((1,'kinetic_energy'),)
         self.SetKineticEnergy = funcproto(('WRP_SetKineticEnergy',self.sesdll),funcparams)
           
         ####### GetExcitationEnergy:
@@ -314,7 +314,7 @@ class SESdll:
                                          ctypes.POINTER(ctypes.c_double), #excitation_energy
                                          )        
                 
-        funcparams = ((1,'excitation_energy'))
+        funcparams = ((1,'excitation_energy'),)
         self.GetExcitationEnergy = funcproto(('WRP_GetExcitationEnergy',self.sesdll),funcparams)
           
         ####### SetExcitationEnergy:
@@ -324,7 +324,7 @@ class SESdll:
                                          ctypes.c_double, #excitation_energy
                                          )        
                 
-        funcparams = ((1,'excitation_energy'))
+        funcparams = ((1,'excitation_energy'),)
         self.SetExcitationEnergy = funcproto(('WRP_SetExcitationEnergy',self.sesdll),funcparams)
                   
         ####### GetElementVoltage:
@@ -339,7 +339,7 @@ class SESdll:
         funcparams = ((1,'element_name'),(1,'element_voltage'))
         self.GetElementVoltage = funcproto(('WRP_GetElementVoltage',self.sesdll),funcparams)
           
-        ####### SetElementEnergy:
+        ####### SetElementVoltage:
         
         funcproto = ctypes.WINFUNCTYPE(
                                          ctypes.c_int,
@@ -348,7 +348,7 @@ class SESdll:
                                          )        
                 
         funcparams = ((1,'element_name'),(1,'element_voltage'))
-        self.SetElementVoltage = funcproto(('WRP_ElementVoltage',self.sesdll),funcparams)
+        self.SetElementVoltage = funcproto(('WRP_SetElementVoltage',self.sesdll),funcparams)
                   
 
         ####### CheckAnalyzerRegion:
